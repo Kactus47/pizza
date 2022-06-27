@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { changePage } from "../redux/pagerSlice";
 import Categories from "./Categories";
 import Sort from "./Sort";
 import PizzaBlock from "./PizzaBlock";
@@ -7,43 +8,40 @@ import PizzaBlockEmpty from "./PizzaBlockEmpty";
 import Pagination from "./Pagination";
 import { SerachContext } from "../App";
 import { setCategoryId, setSort } from "../redux/filterSlice";
+import axios from 'axios';
 
 function Main() {
 
   const {searchValue} = React.useContext(SerachContext);
-  
+
   const {categoryId, sort} = useSelector(state => state.filters);
+  const {curentPage} = useSelector(state => state.pager);
   const dispapth = useDispatch();
-
-
 
   const [pizzas, setPizzas] = React.useState([]);
   const [isPizzaLoading, setIsPizzaLoading] = React.useState(false);
 
 
-  const [itemsPage] = React.useState(4);
-  const [numberPage, setNumberPage] = React.useState(1)
-  const changePage = (number) => setNumberPage(number);
+  const [itemsPage] = React.useState(3);
 
   const categoryUrl = (categoryId === 0) ? '' : `&category=${categoryId}`;
   const sortURL = `sortBy=${sort.type}&order=${sort.sort}`;
   const search = (searchValue !== '') ? `&search=${searchValue}` : '';
-  const pages = `page=${numberPage}&limit=${itemsPage}&`
+  const pages = `page=${curentPage.payload}&limit=${itemsPage}&`
 
   React.useEffect(() => {
     setIsPizzaLoading(false);
-    fetch(`https://62a86fadec36bf40bda5a999.mockapi.io/pizzas?${pages}${sortURL}${categoryUrl}${search}`)
-    .then(response => response.json())
-    .then((pizzas) => {
-      setPizzas(pizzas);
-      setTimeout(() => {
-        setIsPizzaLoading(true);
-      }, 1000);
-    });
-  }, [categoryId, sort, searchValue, numberPage]);
+    axios.get(`https://62a86fadec36bf40bda5a999.mockapi.io/pizzas?${pages}${sortURL}${categoryUrl}${search}`)
+      .then(pizzas => {
+        setPizzas(pizzas.data);
+        setTimeout(() => {
+          setIsPizzaLoading(true);
+        }, 1000);
+      })
+  }, [categoryId, sort, searchValue, curentPage.payload]);
 
   React.useEffect(() => {
-    setNumberPage(1);
+    dispapth(changePage(1));
   }, [categoryId, sort, searchValue]);
 
   return (
@@ -64,7 +62,7 @@ function Main() {
             })
         }
       </div>
-      <Pagination changePage={changePage} namberItem={10} numberPage={numberPage} itemsPage={itemsPage} />
+      <Pagination namberItem={10} numberPage={curentPage.payload} itemsPage={itemsPage} />
     </div>
   );
 }

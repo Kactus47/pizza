@@ -1,5 +1,8 @@
-function Pagination ({namberItem, itemsPage, changePage, numberPage}) {
+import { changePage } from "../redux/pagerSlice";
+import { useDispatch } from "react-redux";
 
+function Pagination ({namberItem, itemsPage, numberPage}) {
+  const dispapth = useDispatch();
   const pager = [];
 
   for(let i = 0; i < Math.ceil(namberItem / itemsPage); i++) {
@@ -10,7 +13,7 @@ function Pagination ({namberItem, itemsPage, changePage, numberPage}) {
     <ul className="pagination">
       {
         pager.map(number => (
-          <li className={(number + 1 === numberPage) ? 'active' : ''} onClick={() => changePage(number + 1)} key={number + 1}>
+          <li className={(number + 1 === numberPage) ? 'active' : ''} onClick={() => dispapth(changePage(number + 1))} key={number + 1}>
             <span>{number + 1}</span>
           </li>
         )) 
