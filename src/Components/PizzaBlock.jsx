@@ -1,10 +1,29 @@
 import React from "react";
+import { addToCart, selectorCartPizzaId } from "../redux/cartSlice";
+import { useSelector, useDispatch } from "react-redux";
 
-function PizzaBlock({ props, title, imageUrl, price, sizes, types }) {
+function PizzaBlock({ id, title, imageUrl, price, sizes, types }) {
+
+  const dispatch = useDispatch();
+  const pizzaObj = useSelector(selectorCartPizzaId(id));
+  const countPizza = (pizzaObj) ?  pizzaObj.count : 0;
+
   const typesPizza = ['тонкое', 'традиционное'];
 
   const [sizePizza, setSizaPizza] = React.useState(0);
   const [typePizza, setTypePizza] = React.useState(0);
+
+  const addPizzaToCart = () => {
+    const currentPizza = {
+      id,
+      imageUrl,
+      title,
+      price,
+      size: sizes[sizePizza],
+      type: typesPizza[typePizza],
+    }
+    dispatch(addToCart(currentPizza))
+  }
 
   return (
     <div className="pizza-block">
@@ -18,12 +37,12 @@ function PizzaBlock({ props, title, imageUrl, price, sizes, types }) {
         <ul>
           {types.map((type, indexType) => {
             return (
-              <li 
-                className={(typePizza === indexType) ? 'active' : ''} 
-                onClick={() => setTypePizza(indexType)} 
+              <li
+                className={(typePizza === indexType) ? 'active' : ''}
+                onClick={() => setTypePizza(indexType)}
                 key={indexType}>
-                  {typesPizza[type]}
-                </li>
+                {typesPizza[type]}
+              </li>
             )
           })}
         </ul>
@@ -38,7 +57,7 @@ function PizzaBlock({ props, title, imageUrl, price, sizes, types }) {
       </div>
       <div className="pizza-block__bottom">
         <div className="pizza-block__price">от {price} ₽</div>
-        <div className="button button--outline button--add">
+        <div onClick={() => addPizzaToCart()} className="button button--outline button--add">
           <svg
             width="12"
             height="12"
@@ -52,7 +71,7 @@ function PizzaBlock({ props, title, imageUrl, price, sizes, types }) {
             />
           </svg>
           <span>Добавить</span>
-          <i>2</i>
+          {countPizza > 0 && <i>{countPizza}</i>}
         </div>
       </div>
     </div>

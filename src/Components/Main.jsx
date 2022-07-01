@@ -1,48 +1,91 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changePage } from "../redux/pagerSlice";
+import qs from 'qs';
+import { useNavigate } from "react-router-dom";
 import Categories from "./Categories";
 import Sort from "./Sort";
 import PizzaBlock from "./PizzaBlock";
 import PizzaBlockEmpty from "./PizzaBlockEmpty";
 import Pagination from "./Pagination";
-import { SerachContext } from "../App";
-import { setCategoryId, setSort } from "../redux/filterSlice";
-import axios from 'axios';
+import { setCategoryId, setSort, setPage, setCurrentPage } from "../redux/filterSlice";
+import { fetchPizza } from "../redux/pizzaSlice";
+import { sortList } from "./Sort";
+
 
 function Main() {
 
-  const {searchValue} = React.useContext(SerachContext);
+  const {categoryId, sort, page, searchValue} = useSelector(state => state.filters);
+  const {pizzas, status} = useSelector(state => state.pizza);
 
-  const {categoryId, sort} = useSelector(state => state.filters);
-  const {curentPage} = useSelector(state => state.pager);
   const dispapth = useDispatch();
-
-  const [pizzas, setPizzas] = React.useState([]);
-  const [isPizzaLoading, setIsPizzaLoading] = React.useState(false);
-
-
+  const navigate = useNavigate();
+  
+  const searchUrlRef = React.useRef(false);
+  const isMounted = React.useRef(false);
   const [itemsPage] = React.useState(3);
 
-  const categoryUrl = (categoryId === 0) ? '' : `&category=${categoryId}`;
-  const sortURL = `sortBy=${sort.type}&order=${sort.sort}`;
-  const search = (searchValue !== '') ? `&search=${searchValue}` : '';
-  const pages = `page=${curentPage.payload}&limit=${itemsPage}&`
+
+  const getPizzas = () => {
+    const categoryUrl = (categoryId === 0) ? '' : `&category=${categoryId}`;
+    const sortURL = `sortBy=${sort.type}&order=${sort.sort}`;
+    const search = (searchValue !== '') ? `&search=${searchValue}` : '';
+    const pages = `page=${page}&limit=${itemsPage}&`;
+
+    dispapth(fetchPizza({
+      categoryUrl,
+      sortURL,
+      search,
+      pages
+    }));
+  }
+
+  
+  React.useEffect(() => {
+    if(isMounted.current) {
+      const queryString = qs.stringify({
+        sortBy: sort.type,
+        order: sort.sort,
+        category: categoryId,
+        page: page
+      });
+      navigate(`?${queryString}`);
+    }
+
+    isMounted.current = true;
+
+  }, [categoryId, sort, searchValue, page]);
+
 
   React.useEffect(() => {
-    setIsPizzaLoading(false);
-    axios.get(`https://62a86fadec36bf40bda5a999.mockapi.io/pizzas?${pages}${sortURL}${categoryUrl}${search}`)
-      .then(pizzas => {
-        setPizzas(pizzas.data);
-        setTimeout(() => {
-          setIsPizzaLoading(true);
-        }, 1000);
-      })
-  }, [categoryId, sort, searchValue, curentPage.payload]);
+    if(window.location.search) {
+      const urlParams = qs.parse(window.location.search.substring(1));
+      const sort = sortList.find((index) => (index.type === urlParams.sortBy && index.sort === urlParams.order));
+      dispapth(
+        setCurrentPage({
+          categoryId: urlParams.category,
+          sort,
+          page: urlParams.page
+        })
+      );
+      searchUrlRef.current = true;
+    }
+  }, []);  
+
+  
+  React.useEffect(() => {
+
+    getPizzas();
+
+  }, [categoryId, sort, searchValue, page]);
 
   React.useEffect(() => {
-    dispapth(changePage(1));
+    dispapth(setPage(1));
   }, [categoryId, sort, searchValue]);
+
+
+
+
+
 
   return (
     <div className="container">
@@ -53,16 +96,18 @@ function Main() {
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">
         {
+          (status === 'loading') ? 
+            <PizzaBlockEmpty />
+            :
             pizzas.map((pizza, index) => {
               return ( 
-                (!isPizzaLoading) ? 
-                  <PizzaBlockEmpty key={index} /> :
+
                   <PizzaBlock key={index} {...pizza} />
               )
             })
         }
       </div>
-      <Pagination namberItem={10} numberPage={curentPage.payload} itemsPage={itemsPage} />
+      <Pagination namberItem={10} numberPage={page} itemsPage={itemsPage} />
     </div>
   );
 }

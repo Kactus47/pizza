@@ -1,39 +1,39 @@
 import React from "react";
 
+export const sortList = [
+  {
+    name: 'популярности desc',
+    type: 'rating',
+    sort: 'desc'
+  },
+  {
+    name: 'популярности asc',
+    type: 'rating',
+    sort: 'asc'
+  },
+  {
+    name: 'цене desc',
+    type: 'price',
+    sort: 'desc'
+  },
+  {
+    name: 'цене asc',
+    type: 'price',
+    sort: 'asc'
+  },
+  {
+    name: 'алфавиту desc',
+    type: 'title',
+    sort: 'desc'
+  },
+  {
+    name: 'алфавиту asc',
+    type: 'title',
+    sort: 'asc'
+  }
+];
+
 function Sort({sortCheck, setSortCheck}) {
-  
-  const sortList = [
-    {
-      name: 'популярности desc',
-      type: 'rating',
-      sort: 'desc'
-    },
-    {
-      name: 'популярности asc',
-      type: 'rating',
-      sort: 'asc'
-    },
-    {
-      name: 'цене desc',
-      type: 'price',
-      sort: 'desc'
-    },
-    {
-      name: 'цене asc',
-      type: 'price',
-      sort: 'asc'
-    },
-    {
-      name: 'алфавиту desc',
-      type: 'title',
-      sort: 'desc'
-    },
-    {
-      name: 'алфавиту asc',
-      type: 'title',
-      sort: 'asc'
-    }
-  ];
 
   const [stateWindow, setStateWindow] = React.useState(false);
 
