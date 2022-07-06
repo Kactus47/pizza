@@ -12,9 +12,10 @@ import { fetchPizza } from "../redux/pizzaSlice";
 import { sortList } from "./Sort";
 
 
-function Main() {
-
+const Main: React.FC = () => {
+    // @ts-ignore
   const {categoryId, sort, page, searchValue} = useSelector(state => state.filters);
+      // @ts-ignore
   const {pizzas, status} = useSelector(state => state.pizza);
 
   const dispapth = useDispatch();
@@ -31,12 +32,15 @@ function Main() {
     const search = (searchValue !== '') ? `&search=${searchValue}` : '';
     const pages = `page=${page}&limit=${itemsPage}&`;
 
-    dispapth(fetchPizza({
-      categoryUrl,
-      sortURL,
-      search,
-      pages
-    }));
+    dispapth(
+      // @ts-ignore
+      fetchPizza({
+        categoryUrl,
+        sortURL,
+        search,
+        pages
+      })
+    );
   }
 
   
@@ -50,7 +54,6 @@ function Main() {
       });
       navigate(`?${queryString}`);
     }
-
     isMounted.current = true;
 
   }, [categoryId, sort, searchValue, page]);
@@ -81,12 +84,7 @@ function Main() {
   React.useEffect(() => {
     dispapth(setPage(1));
   }, [categoryId, sort, searchValue]);
-
-
-
-
-
-
+  
   return (
     <div className="container">
       <div className="content__top">
