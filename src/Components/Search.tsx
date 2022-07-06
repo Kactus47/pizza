@@ -9,11 +9,11 @@ const Search: React.FC = () => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
 
-  const changeSearch = (e: any) => {
+  const changeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     if(inputRef.current) {
       setInputText(inputRef.current.value);
       changeInput(inputRef.current.value);
-    }
+    }    
   }
 
   const changeInput = React.useCallback(

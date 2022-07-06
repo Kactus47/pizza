@@ -97,7 +97,7 @@ const Main: React.FC = () => {
           (status === 'loading') ? 
             <PizzaBlockEmpty />
             :
-            pizzas.map((pizza, index) => {
+            pizzas.map((pizza: any, index: number) => {
               return ( 
 
                   <PizzaBlock key={index} {...pizza} />

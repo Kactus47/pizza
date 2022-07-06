@@ -40,8 +40,8 @@ type SortType = {
 }
 
 type SortProps = {
-  sortCheck: any;
-  setSortCheck: any;
+  sortCheck: SortType;
+  setSortCheck: (ojb: SortType) => void;
 }
 
 const Sort: React.FC<SortProps> = ({sortCheck, setSortCheck}) => {
